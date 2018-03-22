@@ -1,0 +1,197 @@
+{
+	"variables": [],
+	"info": {
+		"name": "AuthorizationService",
+		"_postman_id": "5c3ae215-2daa-0559-98d5-6729960fda9d",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Wellknown",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"var response = JSON.parse(responseBody);",
+							"console.log(\"Wellknown endpoint response is = \" + JSON.stringify(response));"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{url}}/as/v1/.well-known/openid-configuration/",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Register Client - valid inputs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Body has client_id\"] = responseBody.has(\"client_id\");",
+							"tests[\"Body has client_secret\"] = responseBody.has(\"client_secret\");",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"console.log(\"Client_id is = \" + jsonData.client_id);",
+							"console.log(\"Client_secret is = \" + jsonData.client_secret);",
+							"",
+							"postman.setEnvironmentVariable(\"client_id\", jsonData.client_id);",
+							"postman.setEnvironmentVariable(\"client_secret\", jsonData.client_secret);"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": {
+						"consumerKey": "{{consumer_key}}",
+						"consumerSecret": "{{consumer_secret}}",
+						"token": "",
+						"tokenSecret": "",
+						"signatureMethod": "HMAC-SHA256",
+						"timestamp": "",
+						"nonce": "",
+						"version": "",
+						"realm": "",
+						"addParamsToHeader": true,
+						"addEmptyParamsToSign": false
+					}
+				},
+				"url": {
+					"raw": "{{url}}/as/v1/api/clients/{{client_type}}?{{client_type}}={{client_type}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"as",
+						"v1",
+						"api",
+						"clients",
+						"{{client_type}}"
+					],
+					"query": [
+						{
+							"key": "{{client_type}}",
+							"value": "{{client_type}}",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Generate Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"console.log(\"Access token value is = \" + jsonData.access_token);",
+							"console.log(\"Access token type is = \" + jsonData.token_type);",
+							"console.log(\"Access token expires in = \" + jsonData.expires_in);"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{url}}/as/v1/token",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Register Client - invalid inputs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 401 Unauthorized\"] = responseCode.code === 401;",
+							"tests[\"Body contains error message: Authentication failed - Invalid credentials\"] = responseBody.has(\"Authentication failed - Invalid credentials\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": {
+						"consumerKey": "invalid-45X2.QX8cV19aOqm52jy",
+						"consumerSecret": "invalid-jyjAIktuVcudFjTd2Q5E",
+						"token": "",
+						"tokenSecret": "",
+						"signatureMethod": "HMAC-SHA256",
+						"timestamp": "",
+						"nonce": "",
+						"version": "1.0",
+						"realm": "",
+						"addParamsToHeader": true,
+						"addEmptyParamsToSign": false
+					}
+				},
+				"url": "{{url}}/as/v1/api/clients/MingleTechStackService",
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
